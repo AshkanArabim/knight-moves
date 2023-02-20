@@ -1,25 +1,53 @@
 export default function gameboardFactory() {
-  const height = 8;
-  const width = 8;
+  const lenX = 8;
+  const lenY = 8;
 
   let cells = []; // will become a 2d array
 
   // fill cells array with cells
-  for (let i = 0; i < width; i++) {
+  for (let i = 0; i < lenX; i++) {
     let row = [];
-    for (let j = 0; j < height; j++) {
-      row[j] = cellFactory([i, j], [width, height]);
+    for (let j = 0; j < lenY; j++) {
+      const newCell = cellFactory([i, j], [lenY, lenX]);
+      row[j] = newCell;
+
+      // remove invalid next moves of current cell
+      for (let nextMoveIndex in newCell.nextMoves) {
+        if (
+          !(
+            0 <= nextMoves[nextMoveIndex][0] < lenX &&
+            0 <= nextMoves[nextMoveIndex][1] < lenY
+          )
+        ) {
+          nextMoves.splice(nextMoveIndex, 1);
+        }
+      }
     }
     cells[i] = row;
   }
 
-  function getCells() {
-    return cells;
+  // traverse the whole board and link cells to their valid moves
+  // replaces the nextMoves value with the cell corresponding to those coords
+  for (let i = 0; i < lenX; i++) {
+    for (let j = 0; j < lenY; j++) {
+      const cell = cells[(i, j)];
+
+      for (let nextMoveIndex in cell.nextMoves) {
+        // save the coords of the next move
+        const coords = nextMoves[nextMoveIndex];
+        const nextCell = cells[coords[0], coords[1]];
+
+        // replace the coords in nextMoves with cell
+        nextMoves[nextMoveIndex] = nextCell;
+      }
+    }
   }
 
-  return {
-    getCells,
-  };
+  function knightMoves(origin, final) {
+    
+  }
+
+  return {};
 }
 
 function cellFactory(coords, boardDimensions) {
@@ -47,16 +75,12 @@ function cellFactory(coords, boardDimensions) {
     }
   }
 
-  function getNextMoves() {
-    return nextMoves;
-  }
-
   function getCoords() {
-    return coords;
+    return [x, y];
   }
 
   return {
-    getNextMoves,
+    nextMoves,
     getCoords,
   };
 }
