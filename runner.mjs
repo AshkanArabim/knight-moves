@@ -1,4 +1,3 @@
-import gameboardFactory from "./gameboard.mjs";
+import knightMoves from "./gameboard.mjs";
 
-const gameboard = gameboardFactory();
-
+knightMoves([0, 0], [1,2]);
