@@ -24,11 +24,11 @@ export default (function gameboardFactory() {
 
       // console.log(cell); // DEBUG
 
-      for (let nextMoveIndex in cell.nextMoves) {
-        let nm = cell.nextMoves;
+      let nm = cell.nextMoves;
+      for (let nextMoveIndex in nm) {
         // save the coords of the next move
         const coords = nm[nextMoveIndex];
-        const nextCell = cells[(coords[0], coords[1])];
+        const nextCell = cells[coords[0]][coords[1]];
 
         // replace the coords in nextMoves with cell
         nm[nextMoveIndex] = nextCell;
@@ -40,24 +40,31 @@ export default (function gameboardFactory() {
   let shortestPath = [];
   function knightRecurse(currentCoords, endCoords, breadCrumbs) {
     const currentCell = cells[currentCoords[0]][currentCoords[1]];
-    const endNode = cells[(endCoords[0], endCoords[1])];
 
-    if (breadCrumbs.includes(currentCoords)) {
-      // if node visited, just return
+    if (
+      // check if breadcrumbs already includes the current coordinates
+      breadCrumbs.some((arr) =>
+        arr.every((val, index) => val === currentCoords[index])
+      )
+    ) {
       return;
     } else {
       // if not, add current move to tracking
       breadCrumbs.push(currentCoords);
+      console.log(breadCrumbs);
       if (
         // check if the coordinates match
-        currentCoords.toString() === endCoords.toString() &&
+        currentCoords.every(
+          (val, index) => val === endCoords[index]
+        ) &&
         breadCrumbs.length < shortestPath.length
       ) {
         shortestPath = breadCrumbs;
+        console.log("finished!")
       } else {
         for (let nextMove of currentCell.nextMoves) {
           console.log(nextMove.getCoords());
-          knightRecurse(nextMove, endCoords, breadCrumbs);
+          knightRecurse(nextMove.getCoords(), endCoords, breadCrumbs);
         }
       }
     }
@@ -96,6 +103,8 @@ export default (function gameboardFactory() {
       let y = coords[1];
       moves += `${x}, ${y}`;
     }
+    console.log("finished!");
+    console.log(shortestPath);
     return moves;
   }
 
