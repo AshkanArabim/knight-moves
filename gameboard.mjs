@@ -1,8 +1,8 @@
 import cellFactory from "./cell.mjs";
 
 export default (function gameboardFactory() {
-  const lenX = 4;
-  const lenY = 4;
+  const lenX = 8;
+  const lenY = 8;
 
   let cells = []; // will become a 2d array
 
@@ -40,7 +40,7 @@ export default (function gameboardFactory() {
   function knightRecurse(currentCoords, endCoords, breadCrumbs) {
     const currentCell = cells[currentCoords[0]][currentCoords[1]];
 
-    // Base case 1:
+    // Base case 1: if we have it in breadcrumbs, return immediately
     if (
       // check if breadcrumbs already includes the current coordinates
       breadCrumbs.some((arr) =>
@@ -48,13 +48,10 @@ export default (function gameboardFactory() {
       )
     ) {
       // return, because it's already covered
-      console.log(currentCoords + " is already covered!!!");
       return;
     }
 
     breadCrumbs.push(currentCoords);
-
-    console.log(breadCrumbs);
 
     // base case 2: check if the coordinates match
     // if the length of shortest path is 0 or the length is bigger the current path, replace it with current path
@@ -67,14 +64,12 @@ export default (function gameboardFactory() {
     ) {
       shortestPath = [...breadCrumbs];
       // debug:
-      console.log("Shortest path found!!!");
       return;
     }
 
     // recursive case: for each next move, call self
     for (let nextMove of currentCell.nextMoves) {
-      console.log(nextMove.getCoords());
-      knightRecurse(nextMove.getCoords(), endCoords, breadCrumbs);
+      knightRecurse(nextMove.getCoords(), endCoords, [...breadCrumbs]);
     }
   }
 
@@ -87,7 +82,6 @@ export default (function gameboardFactory() {
       let y = cell[1];
       moves += ` --> [${x},${y}]`;
     }
-    console.log("finished!");
     return moves;
   }
 
