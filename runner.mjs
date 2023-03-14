@@ -1,3 +1,3 @@
 import knightMoves from "./gameboard.mjs";
 
-knightMoves([0, 0], [1,2]);
+console.log(knightMoves([0, 0], [2, 1]));

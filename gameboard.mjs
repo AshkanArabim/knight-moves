@@ -1,8 +1,8 @@
 import cellFactory from "./cell.mjs";
 
 export default (function gameboardFactory() {
-  const lenX = 8;
-  const lenY = 8;
+  const lenX = 4;
+  const lenY = 4;
 
   let cells = []; // will become a 2d array
 
@@ -22,8 +22,6 @@ export default (function gameboardFactory() {
     for (let j = 0; j < lenY; j++) {
       const cell = cells[i][j];
 
-      // console.log(cell); // DEBUG
-
       let nm = cell.nextMoves;
       for (let nextMoveIndex in nm) {
         // save the coords of the next move
@@ -36,75 +34,60 @@ export default (function gameboardFactory() {
     }
   }
 
-  // recursive method to find the shortest path
   let shortestPath = [];
+
+  // recursive method to find the shortest path
   function knightRecurse(currentCoords, endCoords, breadCrumbs) {
     const currentCell = cells[currentCoords[0]][currentCoords[1]];
 
+    // Base case 1:
     if (
       // check if breadcrumbs already includes the current coordinates
       breadCrumbs.some((arr) =>
         arr.every((val, index) => val === currentCoords[index])
       )
     ) {
+      // return, because it's already covered
+      console.log(currentCoords + " is already covered!!!");
       return;
-    } else {
-      // if not, add current move to tracking
-      breadCrumbs.push(currentCoords);
-      console.log(breadCrumbs);
-      if (
-        // check if the coordinates match
-        currentCoords.every(
-          (val, index) => val === endCoords[index]
-        ) &&
-        breadCrumbs.length < shortestPath.length
-      ) {
-        shortestPath = breadCrumbs;
-        console.log("finished!")
-      } else {
-        for (let nextMove of currentCell.nextMoves) {
-          console.log(nextMove.getCoords());
-          knightRecurse(nextMove.getCoords(), endCoords, breadCrumbs);
-        }
-      }
-    }
-  }
-
-  // function to determine whether an array contains another array
-  function arrayIncludes(bigArr, subArr) {
-    // iterate over arrays in original array
-    for (let i in bigArr) {
-      let bothEqual = true;
-
-      // compare the elements of this array with the elements of subArr
-      for (let j in bigArr[i]) {
-        // if one is different, z
-        if (bigArr[i][j] !== subArr[j]) {
-          bothEqual = false;
-          break;
-        }
-      }
-
-      if (bothEqual) {
-        return true;
-      }
     }
 
-    return false;
+    breadCrumbs.push(currentCoords);
+
+    console.log(breadCrumbs);
+
+    // base case 2: check if the coordinates match
+    // if the length of shortest path is 0 or the length is bigger the current path, replace it with current path
+    if (
+      // check if currentCoords and endCoords are the same
+      currentCoords.every((val, index) => val === endCoords[index]) &&
+      // check if the length of shortest path is longer or 0
+      (breadCrumbs.length < shortestPath.length ||
+        shortestPath.length === 0)
+    ) {
+      shortestPath = [...breadCrumbs];
+      // debug:
+      console.log("Shortest path found!!!");
+      return;
+    }
+
+    // recursive case: for each next move, call self
+    for (let nextMove of currentCell.nextMoves) {
+      console.log(nextMove.getCoords());
+      knightRecurse(nextMove.getCoords(), endCoords, breadCrumbs);
+    }
   }
 
   function knightMoves(initCoords, endCoords) {
     knightRecurse(initCoords, endCoords, []);
     let moves = "";
 
-    for (cell of shortestPath) {
-      let coords = cell.getCoords();
-      let x = coords[0];
-      let y = coords[1];
-      moves += `${x}, ${y}`;
+    for (let cell of shortestPath) {
+      let x = cell[0];
+      let y = cell[1];
+      moves += ` --> [${x},${y}]`;
     }
     console.log("finished!");
-    console.log(shortestPath);
     return moves;
   }
 
