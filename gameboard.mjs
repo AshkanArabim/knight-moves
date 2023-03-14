@@ -1,8 +1,8 @@
 import cellFactory from "./cell.mjs";
 
 export default (function gameboardFactory() {
-  const lenX = 8;
-  const lenY = 8;
+  const lenX = 6;
+  const lenY = 6;
 
   let cells = []; // will become a 2d array
 
@@ -14,24 +14,6 @@ export default (function gameboardFactory() {
       row[j] = newCell;
     }
     cells[i] = row;
-  }
-
-  // traverse the whole board and link cells to their valid moves
-  // replaces the nextMoves value with the cell corresponding to those coords
-  for (let i = 0; i < lenX; i++) {
-    for (let j = 0; j < lenY; j++) {
-      const cell = cells[i][j];
-
-      let nm = cell.nextMoves;
-      for (let nextMoveIndex in nm) {
-        // save the coords of the next move
-        const coords = nm[nextMoveIndex];
-        const nextCell = cells[coords[0]][coords[1]];
-
-        // replace the coords in nextMoves with cell
-        nm[nextMoveIndex] = nextCell;
-      }
-    }
   }
 
   let shortestPath = [];
@@ -48,10 +30,13 @@ export default (function gameboardFactory() {
       )
     ) {
       // return, because it's already covered
+      console.log(currentCoords + " is already covered!!!");
       return;
     }
 
     breadCrumbs.push(currentCoords);
+
+    console.log(breadCrumbs);
 
     // base case 2: check if the coordinates match
     // if the length of shortest path is 0 or the length is bigger the current path, replace it with current path
@@ -64,12 +49,14 @@ export default (function gameboardFactory() {
     ) {
       shortestPath = [...breadCrumbs];
       // debug:
+      console.log("Shortest path found!!!");
       return;
     }
 
     // recursive case: for each next move, call self
     for (let nextMove of currentCell.nextMoves) {
-      knightRecurse(nextMove.getCoords(), endCoords, [...breadCrumbs]);
+      console.log(nextMove);
+      knightRecurse(nextMove, endCoords, [...breadCrumbs]);
     }
   }
 
@@ -82,6 +69,7 @@ export default (function gameboardFactory() {
       let y = cell[1];
       moves += ` --> [${x},${y}]`;
     }
+    console.log("finished!");
     return moves;
   }
 
