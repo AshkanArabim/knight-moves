@@ -1,8 +1,8 @@
 import cellFactory from "./cell.mjs";
 
 export default (function gameboardFactory() {
-  const lenX = 6;
-  const lenY = 6;
+  const lenX = 8;
+  const lenY = 8;
 
   let cells = []; // will become a 2d array
 
@@ -16,61 +16,71 @@ export default (function gameboardFactory() {
     cells[i] = row;
   }
 
-  let shortestPath = [];
-
-  // recursive method to find the shortest path
-  function knightRecurse(currentCoords, endCoords, breadCrumbs) {
-    const currentCell = cells[currentCoords[0]][currentCoords[1]];
-
-    // Base case 1: if we have it in breadcrumbs, return immediately
-    if (
-      // check if breadcrumbs already includes the current coordinates
-      breadCrumbs.some((arr) =>
-        arr.every((val, index) => val === currentCoords[index])
-      )
-    ) {
-      // return, because it's already covered
-      console.log(currentCoords + " is already covered!!!");
-      return;
-    }
-
-    breadCrumbs.push(currentCoords);
-
-    console.log(breadCrumbs);
-
-    // base case 2: check if the coordinates match
-    // if the length of shortest path is 0 or the length is bigger the current path, replace it with current path
-    if (
-      // check if currentCoords and endCoords are the same
-      currentCoords.every((val, index) => val === endCoords[index]) &&
-      // check if the length of shortest path is longer or 0
-      (breadCrumbs.length < shortestPath.length ||
-        shortestPath.length === 0)
-    ) {
-      shortestPath = [...breadCrumbs];
-      // debug:
-      console.log("Shortest path found!!!");
-      return;
-    }
-
-    // recursive case: for each next move, call self
-    for (let nextMove of currentCell.nextMoves) {
-      console.log(nextMove);
-      knightRecurse(nextMove, endCoords, [...breadCrumbs]);
-    }
-  }
-
   function knightMoves(initCoords, endCoords) {
-    knightRecurse(initCoords, endCoords, []);
-    let moves = "";
+    // each element in the cell is the list of all coordinates (steps) that led to it.
+    // for the first cell, it's just itself
+    // for example, an element with two previous steps would be: [initCoords, prevCoords, CurrentCoords]
+    const queue = [[initCoords]];
+    let shortestPath;
 
-    for (let cell of shortestPath) {
-      let x = cell[0];
-      let y = cell[1];
-      moves += ` --> [${x},${y}]`;
+    // create a visited array that is filled with false by default
+    let visited = new Array(lenX);
+    for (let i = 0; i < visited.length; i++) {
+      visited[i] = new Array(lenY).fill(false);
     }
-    console.log("finished!");
-    return moves;
+
+    console.log(cells);
+
+    while (queue.length > 0) {
+      const currentSteps = queue.shift();
+      const currentCoords = currentSteps[currentSteps.length - 1];
+      const [idx1, idx2] = [...currentCoords];
+
+      console.log(idx1);
+      console.log(idx2);
+
+      const currentCell = cells[idx1][idx2];
+
+      // if currentCell not visited,
+      if (!visited[idx1][idx2]) {
+        // check if it matches the final coordinates
+        if (
+          currentCoords.every(
+            (element, index) => element === endCoords[index]
+          )
+        ) {
+          // if it's destination, set shortestPath
+          shortestPath = currentSteps;
+          // break
+          break;
+        }
+
+        // if not,
+        // set it to visited
+        visited[idx1][idx2] = true;
+
+        // add its children to queue with length = length + 1
+        for (let nextCell of currentCell.nextMoves) {
+          queue.push([...currentSteps, nextCell]);
+        }
+      }
+    }
+
+    // if shortestPath found
+    const shortestLen = shortestPath.length;
+    if (shortestLen > 0) {
+      // print the stuff
+      console.log(
+        `You made it in ${shortestLen} moves! Here's your path:`
+      );
+      for (let step of shortestPath) {
+        console.log(step);
+      }
+    } else {
+      console.log(
+        `Looks like we can't reach that cell in our ${lenX} by ${lenY} board with a knight.`
+      );
+    }
   }
 
   return knightMoves;

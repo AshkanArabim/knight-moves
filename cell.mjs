@@ -16,7 +16,7 @@ export default function cellFactory(coords, boardDimensions) {
     [x + 2, y - 1],
   ];
 
-  // remove invalid next moves
+  // remove invalid next moves based on board dimensions
   let i = 0;
   while (i < nextMoves.length) {
     const ix = nextMoves[i][0];
@@ -28,12 +28,7 @@ export default function cellFactory(coords, boardDimensions) {
     i++;
   }
 
-  function getCoords() {
-    return [x, y];
-  }
-
   return {
     nextMoves,
-    getCoords,
   };
 }
